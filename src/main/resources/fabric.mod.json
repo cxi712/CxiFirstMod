@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "cxifirstmod",
+	"version": "${version}",
+	"name": "CxiFirstMod",
+	"description": "这是我制作的第一个Java版模组!",
+	"authors": [
+		"常袭"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/cxifirstmod/icon.jpg",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.cxi.CxiFirstMod"
+		],
+		"fabric-datagen": [
+			"com.cxi.CxiFirstModDataGenerator"
+		]
+	},
+	"mixins": [
+		"cxifirstmod.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.22",
+		"minecraft": "~1.20.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
