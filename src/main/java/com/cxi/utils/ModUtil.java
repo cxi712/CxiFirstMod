@@ -47,7 +47,8 @@ public class ModUtil {
     }
 
     public static int blockChain(PlayerEntity player, World world, Block block, BlockPos blockPos) {
-        int max = 100;
+        int max = 1000;
+        max -= 1;
         ArrayList<BlockPos> blockPoss1 = getBlockChain(world, block, blockPos, new ArrayList<>(), new ArrayList<>(), 0);
         ArrayList<BlockPos> blockPoss2 = new ArrayList<>();
         blockPoss1.forEach(blockPos1 -> {
@@ -64,10 +65,14 @@ public class ModUtil {
             }
             if (a) blockPoss2.add(blockPos1);
         });
+        int j = 0;
         for (int i = 0; i < max && i < blockPoss2.size(); i++) {
-            world.breakBlock(blockPoss2.get(i), true);
+            if (player.getMainHandStack().isSuitableFor(world.getBlockState(blockPoss2.get(i)))) {
+                world.breakBlock(blockPoss2.get(i), true);
+                j++;
+            }
         }
-        return Math.min(blockPoss2.size(), max);
+        return j;
     }
 
     public static ArrayList<BlockPos> getBlockChain(World world, Block block, BlockPos blockPos, ArrayList<BlockPos> blockPoss, ArrayList<Integer> come, int depth) {

@@ -13,7 +13,6 @@ import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,10 @@ public class CxiFirstMod implements ModInitializer {
                 String text = IOUtil.readStringProp(IOUtil.root + "chainSwitch", player.getUuidAsString(), "on");
                 if (text.equals("on")) {
                     JsonArray jsonArray = new Gson().fromJson(IOUtil.readStringProp(IOUtil.root + "chain", player.getUuidAsString(), "[]"), JsonArray.class);
-                    if (!jsonArray.isEmpty() && new Gson().toJson(jsonArray).contains("\"" + state.getBlock().getName().getString() + "\""))
-                        player.sendMessage(Text.literal("成功连锁" + ModUtil.blockChain(player, world, state.getBlock(), pos) + "个方块"));
+                    if (!jsonArray.isEmpty() && new Gson().toJson(jsonArray).contains("\"" + state.getBlock().getName().getString() + "\"")) {
+                        int a = ModUtil.blockChain(player, world, state.getBlock(), pos) + 1;
+                        if (a > 1) player.sendMessage(Text.literal("成功连锁" + a + "个方块"));
+                    }
                 }
             });
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
