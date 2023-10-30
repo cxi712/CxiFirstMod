@@ -1,6 +1,5 @@
 package com.cxi.utils;
 
-import com.mojang.brigadier.Command;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,15 +29,20 @@ import static com.cxi.CxiFirstMod.MOD_ID;
 public class ModUtil {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static Item registerItem(Item item, ItemGroup... itemGroups) {
-        return Registry.register(Registries.ITEM, new Identifier(MOD_ID, item.getName().getString()), item);
+    public static Item registerItem(String name, Item item) {
+        return Registry.register(Registries.ITEM, new Identifier(MOD_ID, name), item);
     }
 
     public static Item addToGroups(Item item, ItemGroup... itemGroups) {
         for (ItemGroup itemGroup : itemGroups) {
             RegistryKey<ItemGroup> registryKey = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier(MOD_ID, itemGroup.getDisplayName().getString()));
-            ItemGroupEvents.modifyEntriesEvent(registryKey).register(entries -> entries.add(item));
+            addToGroups(item, registryKey);
         }
+        return item;
+    }
+
+    public static Item addToGroups(Item item, RegistryKey<ItemGroup> itemGroup) {
+        ItemGroupEvents.modifyEntriesEvent(itemGroup).register(entries -> entries.add(item));
         return item;
     }
 
@@ -67,10 +71,8 @@ public class ModUtil {
         });
         int j = 0;
         for (int i = 0; i < max && i < blockPoss2.size(); i++) {
-            if (player.getMainHandStack().isSuitableFor(world.getBlockState(blockPoss2.get(i)))) {
-                world.breakBlock(blockPoss2.get(i), true);
-                j++;
-            }
+            world.breakBlock(blockPoss2.get(i), true);
+            j++;
         }
         return j;
     }

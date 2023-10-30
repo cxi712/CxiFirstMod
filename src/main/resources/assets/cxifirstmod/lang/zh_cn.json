@@ -1,4 +1,6 @@
 {
-  "item.template-mod.copper_sword": "铜剑",
-  "itemgroup.template-mod.moditems": "模组物品"
+  "item.cxifirstmod.copper_sword": "铜剑",
+  "item.cxifirstmod.copper_pickaxe": "铜镐",
+  "item.cxifirstmod.copper_axe": "铜斧",
+  "item.cxifirstmod.copper_shovel": "铜铲"
 }

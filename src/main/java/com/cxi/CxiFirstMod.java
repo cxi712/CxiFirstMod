@@ -7,15 +7,27 @@ import com.google.gson.JsonArray;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.BlockPosArgumentType;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.*;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.GlobalPos;
+import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Optional;
 
 public class CxiFirstMod implements ModInitializer {
     public static final String MOD_ID = "cxifirstmod";
@@ -127,10 +139,76 @@ public class CxiFirstMod implements ModInitializer {
                                                     }
                                                     return 1;
                                                 }))
-                                ));
+                                )
+                                .then(CommandManager.literal("kill").executes(context -> {
+                                    PlayerEntity player = context.getSource().getPlayer();
+                                    if (player != null) {
+                                        player.kill();
+                                        context.getSource().sendMessage(Text.literal("自杀成功"));
+                                    }
+                                    return 1;
+                                }))
+                                .then(CommandManager.literal("back").executes(context -> {
+                                    PlayerEntity player = context.getSource().getPlayer();
+                                    if (player != null) {
+                                        BlockPos pos = player.getLastDeathPos().get().getPos();
+                                        player.teleport(pos.getX(), pos.getY(), pos.getZ());
+                                        context.getSource().sendMessage(Text.literal("传送成功"));
+                                    }
+                                    return 1;
+                                }))
+                                .then(CommandManager.literal("tp").then(CommandManager.argument("position", EntityArgumentType.player()).executes(context -> {
+                                    PlayerEntity player = context.getSource().getPlayer();
+                                    if (player != null) {
+                                        PlayerEntity entity = EntityArgumentType.getPlayer(context, "position");
+                                        player.teleport(entity.getX(), entity.getY(), entity.getZ());
+                                        context.getSource().sendMessage(Text.literal("传送成功"));
+                                    }
+                                    return 1;
+                                }))));
             });
+            ToolMaterial copper_tool = new ToolMaterial() {
+                @Override
+                public int getDurability() {
+                    return ToolMaterials.STONE.getDurability();
+                }
+
+                @Override
+                public float getMiningSpeedMultiplier() {
+                    return ToolMaterials.IRON.getMiningSpeedMultiplier();
+                }
+
+                @Override
+                public float getAttackDamage() {
+                    return ToolMaterials.IRON.getAttackDamage();
+                }
+
+                @Override
+                public int getMiningLevel() {
+                    return ToolMaterials.IRON.getMiningLevel();
+                }
+
+                @Override
+                public int getEnchantability() {
+                    return ToolMaterials.IRON.getMiningLevel();
+                }
+
+                @Override
+                public Ingredient getRepairIngredient() {
+                    return Ingredient.ofItems(Items.COPPER_INGOT);
+                }
+            };
+            Item copper_sword = ModUtil.registerItem("copper_sword", new SwordItem(copper_tool,3,-2.4F,new FabricItemSettings()));
+            Item copper_pickaxe = ModUtil.registerItem("copper_pickaxe", new PickaxeItem(copper_tool, 1, -2.8F,new FabricItemSettings()));
+            Item copper_axe = ModUtil.registerItem("copper_axe", new AxeItem(copper_tool, 6, -3.2F,new FabricItemSettings()));
+            Item copper_shovel = ModUtil.registerItem("copper_shovel", new ShovelItem(copper_tool, 1.5F, -3F,new FabricItemSettings()));
+            ModUtil.addToGroups(copper_sword,ItemGroups.COMBAT);
+            ModUtil.addToGroups(copper_pickaxe,ItemGroups.TOOLS);
+            ModUtil.addToGroups(copper_axe,ItemGroups.TOOLS);
+            ModUtil.addToGroups(copper_shovel,ItemGroups.TOOLS);
+
         } catch (Exception e) {
-            LOGGER.error(e.toString());
+            e.printStackTrace();
         }
     }
 }
