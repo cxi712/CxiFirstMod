@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
@@ -44,7 +45,7 @@ public class IOUtil {
 			if (!file.exists()) return;
 			if (file.isDirectory()) {
 				File[] files = file.listFiles();
-				if (files != null && files.length > 0)
+				if (files != null)
 					for (File f:files) {
 						deleteFiles(f.getPath());
 					}
@@ -185,17 +186,17 @@ public class IOUtil {
 		try {
 			File file = createFile(path);
 			Properties p = new Properties();
-			p.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+			p.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 			p.setProperty(key, value);
 			PROP_POOL.put(path + "/" + key, value);
-			p.store(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"), "SEC YYDS");
+			p.store(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8), "SEC YYDS");
 		} catch (Exception e) {
 			logException(e);
 		}
 	}
 
 	public static void writeLongProp(String path, String key, long value) {
-		writeStringProp(path, key, value + "");
+		writeStringProp(path, key, String.valueOf(value));
 	}
 
 	public static String readStringProp(String path, String key, String value) {
@@ -203,7 +204,7 @@ public class IOUtil {
 			if (PROP_POOL.containsKey(path + "/" + key)) return PROP_POOL.get(path + "/" + key);
 			File file = createFile(path);
 			Properties p = new Properties();
-			p.load(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+			p.load(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 			value = p.getProperty(key, value);
 			PROP_POOL.put(path + "/" + key, value);
 		} catch (Exception e) {
@@ -213,7 +214,7 @@ public class IOUtil {
 	}
 
 	public static long readLongProp(String path, String key, long value) {
-		return Long.parseLong(readStringProp(path, key, value + ""));
+		return Long.parseLong(readStringProp(path, key, String.valueOf(value)));
 	}
 
 

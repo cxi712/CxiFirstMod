@@ -141,7 +141,7 @@ public class HttpUtil {
     /**
      * 忽视证书HostName
      */
-    private static HostnameVerifier ignoreHostnameVerifier = new HostnameVerifier() {
+    private static final HostnameVerifier ignoreHostnameVerifier = new HostnameVerifier() {
         public boolean verify(String s, SSLSession sslsession) {
             //System.out.println("WARNING: Hostname is not matched for cert.");
             return true;
@@ -151,7 +151,7 @@ public class HttpUtil {
     /**
      * Ignore Certification
      */
-    private static TrustManager ignoreCertificationTrustManger = new X509TrustManager() {
+    private static final TrustManager ignoreCertificationTrustManger = new X509TrustManager() {
 
 
         @Override
