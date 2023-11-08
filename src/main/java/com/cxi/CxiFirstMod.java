@@ -1,7 +1,7 @@
 package com.cxi;
 
-import com.cxi.entities.client.ChomperRenderer;
-import com.cxi.entities.custom.ChomperEntity;
+import com.cxi.entities.client.SuperZombieEntityRenderer;
+import com.cxi.entities.custom.SuperZombieEntity;
 import com.cxi.utils.IOUtil;
 import com.cxi.utils.ModUtil;
 import com.google.gson.Gson;
@@ -12,9 +12,9 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.kyrptonaught.customportalapi.api.CustomPortalBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.command.argument.BlockPosArgumentType;
@@ -252,12 +252,30 @@ public class CxiFirstMod implements ModInitializer {
             ModUtil.addToGroups(copper_axe, ItemGroups.TOOLS);
             ModUtil.addToGroups(copper_shovel, ItemGroups.TOOLS);
             GeckoLib.initialize();
+            //传送门测试
+            CustomPortalBuilder.beginPortal()
+                    .frameBlock(Blocks.IRON_BLOCK)
+                    .lightWithItem(Items.WATER_BUCKET)
+                    .destDimID(new Identifier(MOD_ID,"mining"))
+                    .tintColor(234,83,8)
+                    .registerPortal();
+
+
+            //生物测试
+            /*
             EntityType<ChomperEntity> chomper = Registry.register(Registries.ENTITY_TYPE,
                     new Identifier(MOD_ID, "chomper"),
                     FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ChomperEntity::new)
                             .dimensions(EntityDimensions.fixed(0.4f,1.5f)).build());
-            FabricDefaultAttributeRegistry.register(chomper, ChomperEntity.setAttributes());
             EntityRendererRegistry.register(chomper, ChomperRenderer::new);
+            FabricDefaultAttributeRegistry.register(chomper, ChomperEntity.setAttributes());*/
+            EntityType<SuperZombieEntity> superZombie = Registry.register(Registries.ENTITY_TYPE,
+                    new Identifier(MOD_ID, "super_zombie"),
+                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SuperZombieEntity::new)
+                            .dimensions(EntityDimensions.fixed(0.4f,1.5f)).build());
+            EntityRendererRegistry.register(superZombie, SuperZombieEntityRenderer::new);
+            FabricDefaultAttributeRegistry.register(superZombie, SuperZombieEntity.setAttributes());
+
         } catch (Exception e) {
             e.printStackTrace();
         }

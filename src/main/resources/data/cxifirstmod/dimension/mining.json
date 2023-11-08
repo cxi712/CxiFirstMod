@@ -1,0 +1,11 @@
+{
+  "type": "cxifirstmod:mining",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "cxifirstmod:mining",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "minecraft:plains"
+    }
+  }
+}

@@ -1,12 +1,19 @@
 package com.cxi.entities.custom;
 
+import com.cxi.utils.IOUtil;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.ZombieEntityModel;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,10 +35,10 @@ import software.bernie.geckolib.core.object.PlayState;
  * @description: TODO
  * @date 2023/10/31 16:53
  */
-public class ChomperEntity extends HostileEntity implements GeoEntity {
+public class SuperZombieEntity extends HostileEntity implements GeoEntity {
     private final AnimatableInstanceCache factory = new SingletonAnimatableInstanceCache(this);
 
-    public ChomperEntity(EntityType<? extends HostileEntity> entityType, World world) {
+    public SuperZombieEntity(EntityType<? extends HostileEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -61,13 +68,18 @@ public class ChomperEntity extends HostileEntity implements GeoEntity {
     }
 
     private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> tAnimationState) {
-        if (tAnimationState.isMoving()) {
-            tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.chomper.walk",
-                    Animation.LoopType.LOOP));
+        long time = System.currentTimeMillis() - (long) IOUtil.getStaticData("moveTick", 0L);
+        if (tAnimationState.isMoving() && time > 2000) {
+            System.out.println(time);
+            IOUtil.putStaticData("moveTick", System.currentTimeMillis());
+            tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.super_zombie.walk",
+                    Animation.LoopType.HOLD_ON_LAST_FRAME));
             return PlayState.CONTINUE;
         }
-        tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.chomper.idle",
-                Animation.LoopType.LOOP));
+        /*if (isAttacking()) {
+            tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.super_zombie.attack",
+                    Animation.LoopType.LOOP));
+        }*/
         return PlayState.CONTINUE;
 
     }
@@ -80,12 +92,12 @@ public class ChomperEntity extends HostileEntity implements GeoEntity {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.ENTITY_DOLPHIN_AMBIENT;
+        return SoundEvents.ENTITY_ZOMBIE_AMBIENT;
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource source) {
-        return SoundEvents.ENTITY_DOLPHIN_HURT;
+        return SoundEvents.ENTITY_ZOMBIE_HURT;
     }
 
     @Override

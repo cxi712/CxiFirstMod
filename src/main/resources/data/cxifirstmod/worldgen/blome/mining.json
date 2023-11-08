@@ -1,0 +1,48 @@
+{
+  "temperature": 0.6,
+  "downfall": 0.4,
+  "has_precipitation": false,
+  "temperature_modifier": "none",
+  "creature_spawn_probability": 1,
+  "effects": {
+    "sky_color": 0,
+    "fog_color": 0,
+    "water_color": 4159204,
+    "water_fog_color": 329011,
+    "mood_sound": {
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000,
+      "block_search_extent": 8,
+      "offset": 2
+    }
+  },
+  "spawners": {
+    "monster": [
+      {
+        "type": "minecraft:zombie",
+        "weight": 100,
+        "minCount": 1000,
+        "maxCount": 10000
+      },
+      {
+        "type": "minecraft:wither_skull",
+        "weight": 99,
+        "minCount": 1000,
+        "maxCount": 10000
+      }
+    ]
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [
+      "minecraft:cave",
+      "minecraft:cave_extra_underground",
+      "minecraft:canyon",
+      "minecraft:nether_cave"
+    ]
+  },
+  "features": [
+    "minecraft:ore_dirt",
+    "minecraft:ore_gold_lower"
+  ]
+}

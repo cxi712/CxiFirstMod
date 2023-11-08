@@ -20,10 +20,20 @@ public class IOUtil {
 	public static HashMap<String,String> BUFF_POOL = new HashMap<>();
 	public static HashMap<String,Object> OBJE_POOL = new HashMap<>();
 	public static HashMap<String,String> PROP_POOL = new HashMap<>();
+	public static HashMap<String,Object> STAT_POOL = new HashMap<>();
 	public static String root = "D:\\MCData\\";
 	/*public static String getSDCardPath() {
 		return Environment.getExternalStorageDirectory().getPath();
 	}*/
+
+	public static void putStaticData(String name,Object value) {
+		STAT_POOL.put(name,value);
+	}
+	public static Object getStaticData(String name, Object value) {
+		if (STAT_POOL.containsKey(name)) return STAT_POOL.get(name);
+		return value;
+	}
+
 	public static File createFile(String path) {
 		if (!path.endsWith(".png")) path += ".txt";
 		File file = null;
