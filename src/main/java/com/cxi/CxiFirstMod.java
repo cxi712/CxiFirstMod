@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.bernie.geckolib.GeckoLib;
 
+import java.awt.*;
+
 public class CxiFirstMod implements ModInitializer {
     public static final String MOD_ID = "cxifirstmod";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -43,6 +45,9 @@ public class CxiFirstMod implements ModInitializer {
         try {
 
             LOGGER.info("CxiFirstMod loaded!");
+            //初始化Geckolib
+            GeckoLib.initialize();
+            //连锁采集监听
             PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, entity) -> {
                 String text = IOUtil.readStringProp(IOUtil.root + "chainSwitch", player.getUuidAsString(), "on");
                 if (text.equals("on")) {
@@ -53,6 +58,7 @@ public class CxiFirstMod implements ModInitializer {
                     }
                 }
             });
+            //指令监听
             CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
                 dispatcher.register(
                         CommandManager.literal("cxi")
@@ -193,11 +199,13 @@ public class CxiFirstMod implements ModInitializer {
                                     return 1;
                                 }))));
             });
-            final long[] t1 = {System.currentTimeMillis() / 1000};
+            //游戏刻监听
             ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
+                long cleanTime = (long) IOUtil.getStaticData("cleanTime", 0L);
                 long time = System.currentTimeMillis();
-                if (t1[0] != time / 1000) {
-                    t1[0] = time / 1000;
+                if (cleanTime != time / 1000) {
+                    cleanTime = time / 1000;
+                    IOUtil.putStaticData("cleanTime", cleanTime);
                     if (time / 1000 % 1000 == 0) {
                         for (ItemEntity item : serverWorld.getEntitiesByType(EntityType.ITEM, item -> true)) {
                             item.remove(Entity.RemovalReason.KILLED);
@@ -212,6 +220,7 @@ public class CxiFirstMod implements ModInitializer {
                     }
                 }
             });
+            //铜工具测试
             ToolMaterial copper_tool = new ToolMaterial() {
                 @Override
                 public int getDurability() {
@@ -243,38 +252,39 @@ public class CxiFirstMod implements ModInitializer {
                     return Ingredient.ofItems(Items.COPPER_INGOT);
                 }
             };
-            Item copper_sword = ModUtil.registerItem("copper_sword", new SwordItem(copper_tool, 3, -2.4F, new FabricItemSettings()));
-            Item copper_pickaxe = ModUtil.registerItem("copper_pickaxe", new PickaxeItem(copper_tool, 1, -2.8F, new FabricItemSettings()));
-            Item copper_axe = ModUtil.registerItem("copper_axe", new AxeItem(copper_tool, 6, -3.2F, new FabricItemSettings()));
-            Item copper_shovel = ModUtil.registerItem("copper_shovel", new ShovelItem(copper_tool, 1.5F, -3F, new FabricItemSettings()));
+            Item copper_sword = new SwordItem(copper_tool, 3, -2.4F, new FabricItemSettings());
+            Item copper_pickaxe = new PickaxeItem(copper_tool, 1, -2.8F, new FabricItemSettings());
+            Item copper_axe = new AxeItem(copper_tool, 6, -3.2F, new FabricItemSettings());
+            Item copper_shovel = new ShovelItem(copper_tool, 1.5F, -3F, new FabricItemSettings());
+
+            //矿界维度测试
+            CustomPortalBuilder.beginPortal()
+                    .frameBlock(Blocks.IRON_BLOCK)
+                    .lightWithItem(Items.WATER_BUCKET)
+                    .destDimID(new Identifier(MOD_ID, "mining"))
+                    .tintColor(234, 83, 8)
+                    .registerPortal();
+            //生物测试
+            EntityType<SuperZombieEntity> superZombie = Registry.register(Registries.ENTITY_TYPE,
+                    new Identifier(MOD_ID, "super_zombie"),
+                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SuperZombieEntity::new)
+                            .dimensions(EntityDimensions.fixed(1f, 3f)).build());
+            Item super_zombie_spawn_egg = new SpawnEggItem(superZombie, 0x001122, 0xFFEE22, new Item.Settings());
+            EntityRendererRegistry.register(superZombie, SuperZombieEntityRenderer::new);
+            FabricDefaultAttributeRegistry.register(superZombie, SuperZombieEntity.setAttributes());
+            //注册物品
+            ModUtil.registerItem("copper_sword", copper_sword);
+            ModUtil.registerItem("copper_pickaxe", copper_pickaxe);
+            ModUtil.registerItem("copper_axe", copper_axe);
+            ModUtil.registerItem("copper_shovel", copper_shovel);
+            ModUtil.registerItem("super_zombie_spawn_egg", super_zombie_spawn_egg);
+            //添加至物品组
             ModUtil.addToGroups(copper_sword, ItemGroups.COMBAT);
             ModUtil.addToGroups(copper_pickaxe, ItemGroups.TOOLS);
             ModUtil.addToGroups(copper_axe, ItemGroups.TOOLS);
             ModUtil.addToGroups(copper_shovel, ItemGroups.TOOLS);
-            GeckoLib.initialize();
-            //传送门测试
-            CustomPortalBuilder.beginPortal()
-                    .frameBlock(Blocks.IRON_BLOCK)
-                    .lightWithItem(Items.WATER_BUCKET)
-                    .destDimID(new Identifier(MOD_ID,"mining"))
-                    .tintColor(234,83,8)
-                    .registerPortal();
+            ModUtil.addToGroups(super_zombie_spawn_egg, ItemGroups.SPAWN_EGGS);
 
-
-            //生物测试
-            /*
-            EntityType<ChomperEntity> chomper = Registry.register(Registries.ENTITY_TYPE,
-                    new Identifier(MOD_ID, "chomper"),
-                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ChomperEntity::new)
-                            .dimensions(EntityDimensions.fixed(0.4f,1.5f)).build());
-            EntityRendererRegistry.register(chomper, ChomperRenderer::new);
-            FabricDefaultAttributeRegistry.register(chomper, ChomperEntity.setAttributes());*/
-            EntityType<SuperZombieEntity> superZombie = Registry.register(Registries.ENTITY_TYPE,
-                    new Identifier(MOD_ID, "super_zombie"),
-                    FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SuperZombieEntity::new)
-                            .dimensions(EntityDimensions.fixed(0.4f,1.5f)).build());
-            EntityRendererRegistry.register(superZombie, SuperZombieEntityRenderer::new);
-            FabricDefaultAttributeRegistry.register(superZombie, SuperZombieEntity.setAttributes());
 
         } catch (Exception e) {
             e.printStackTrace();

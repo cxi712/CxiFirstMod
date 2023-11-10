@@ -19,7 +19,7 @@
   "spawners": {
     "monster": [
       {
-        "type": "minecraft:zombie",
+        "type": "cxifirstmod:super_zombie",
         "weight": 100,
         "minCount": 1000,
         "maxCount": 10000
